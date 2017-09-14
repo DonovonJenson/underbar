@@ -271,6 +271,16 @@ if (iterator === undefined){
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var args = Array.prototype.slice.call(arguments);
+ for (var i = 1; i < args.length; i++){
+   var currentObject = args[i];
+   _.each(currentObject,function(value,key,currentObject){
+     if (obj[key] === undefined) {
+       obj[key] = value;
+     }
+   })
+ }
+ return obj;
   };
 
 
@@ -314,8 +324,18 @@ if (iterator === undefined){
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var results = {};
+    return function() {
+      var tried = JSON.stringify(arguments);
+      if (results[tried]){
+        return results[tried];
+      } else {
+        var result = func.apply(this,arguments);
+        results[tried] = result;
+        return result;
+      }
+    }
   };
-
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
   //
@@ -323,8 +343,14 @@ if (iterator === undefined){
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
-  };
-
+    var result;
+    var args = Array.prototype.slice.call(arguments,2);
+      setInterval(function(){
+      result = func.apply(this, args);
+      return result;
+    }
+  ,wait);
+}
 
   /**
    * ADVANCED COLLECTION OPERATIONS
@@ -337,6 +363,14 @@ if (iterator === undefined){
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var copyArray = array.slice(0,array.length);
+    var randomArray = [];
+    for (var i = 0; i < array.length; i++){
+      var current = Math.floor(Math.random()*copyArray.length)
+      randomArray.push(copyArray[current]);
+      copyArray.splice(current,1)
+    }
+    return randomArray;
   };
 
 
